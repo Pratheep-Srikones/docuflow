@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const HomePage = () => {
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
@@ -26,18 +28,16 @@ const HomePage = () => {
             continue.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <button
-              onClick={() => (window.location.href = "/user-auth")}
-              className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto"
-            >
-              Public
-            </button>
-            <button
-              onClick={() => (window.location.href = "/staff-auth")}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition w-full sm:w-auto"
-            >
-              Staff
-            </button>
+            <Link to="/user/auth/login">
+              <button className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto">
+                Public
+              </button>
+            </Link>
+            <Link to="/staff/auth/login">
+              <button className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition w-full sm:w-auto">
+                Staff
+              </button>
+            </Link>
           </div>
         </div>
       </main>
