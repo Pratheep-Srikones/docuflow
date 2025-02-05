@@ -1,17 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  get_applications_by_applicant,
+  get_applications_count,
+} from "../../services/application.services";
+import { Application } from "../../types/types";
 
 const UserDashboard = () => {
-  const [applications] = useState([
-    { id: 1, title: "Document 1", status: "Pending" },
-    { id: 2, title: "Document 2", status: "Approved" },
-  ]);
-  const [userDetails] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "johndoe@example.com",
-    phone: "123-456-7890",
-  });
+  const [applications, setApplications] = useState<Application[]>([]);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const data = await get_applications_by_applicant();
+        setApplications(data.applications);
+      } catch (error) {
+        console.error("Error while fetching applications:", error);
+      }
+    };
+    fetchApplications();
+  }, []);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -29,7 +38,11 @@ const UserDashboard = () => {
 
   const navigate = useNavigate();
 
-  const handleAddApplication = () => {
+  const handleAddApplication = async () => {
+    if ((await get_applications_count()) >= 5) {
+      alert("You already have some pending applications try again.");
+      return;
+    }
     navigate("/user/application/add"); // Route to add application page
   };
 
@@ -56,7 +69,7 @@ const UserDashboard = () => {
         {/* Welcome Message */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-semibold text-gray-800">
-            Welcome, {userDetails.firstName} {userDetails.lastName}!
+            Welcome, {localStorage.getItem("user_name")}!
           </h2>
         </div>
 
@@ -80,7 +93,7 @@ const UserDashboard = () => {
                 </thead>
                 <tbody>
                   {applications.map((application) => (
-                    <tr key={application.id} className="border-b">
+                    <tr key={application.application_id} className="border-b">
                       <td className="px-4 py-2">{application.title}</td>
                       <td className="px-4 py-2">{application.status}</td>
                     </tr>
@@ -108,10 +121,13 @@ const UserDashboard = () => {
           </h3>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <p>
-              <strong>Email:</strong> {userDetails.email}
+              <strong>Email:</strong> {localStorage.getItem("email")}
             </p>
             <p>
-              <strong>Phone:</strong> {userDetails.phone}
+              <strong>Phone:</strong> {localStorage.getItem("phone")}
+            </p>
+            <p>
+              <strong>NIC:</strong> {localStorage.getItem("nic")}
             </p>
           </div>
         </div>

@@ -2,8 +2,13 @@ import uuid
 from fastapi import File, Response, UploadFile
 from app.controllers.user_controller import get_user_by_id
 from db.supabase import create_supabase_client
+import random
+import string
 
 BUCKET_NAME = "documents"
+def generate_random_string(length=4):
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(length))
 
 async def upload_pdf_to_supabase_storage(applicant_id: str, response:Response, file: UploadFile = File(...)):
     if file.content_type != "application/pdf":
@@ -22,7 +27,7 @@ async def upload_pdf_to_supabase_storage(applicant_id: str, response:Response, f
     if applicant.get("nic") is None:
         return {"error": "Applicant NIC not found", "status": 404}
     
-    file_name = applicant.get("nic") + ".pdf"
+    file_name = applicant.get("nic") + generate_random_string(4)+ ".pdf"
     file_name = file_name.lstrip("/")
 
     supabase = await create_supabase_client()

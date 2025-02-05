@@ -87,3 +87,30 @@ async def delete_staff_model(staff_id: str):
     
     except Exception as e:
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
+
+async def get_staff_with_low_applications_model(branch_id: str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('staff').select('*').eq('branch_id', branch_id).eq('role',"clerical").order('assigned_applications', desc=False).limit(1).execute()
+        
+        if not response.data:
+            return {"error": "Staff not found", "status": 404}
+        
+        return {"staff": response.data[0], "message": "Staff found", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def increase_assigned_applications_model(staff_id):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('staff').select('assigned_applications').eq('staff_id', staff_id).execute()
+        
+        assigned_applications = response.data[0]['assigned_applications']
+        
+        response = await supabase.from_('staff').update({"assigned_applications": assigned_applications + 1}).eq('staff_id', staff_id).execute()
+        
+        return {"message": "Assigned applications updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}

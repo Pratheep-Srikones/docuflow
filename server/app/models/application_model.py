@@ -87,7 +87,6 @@ async def create_application_model(application: Application):
             "assigned_to": application.assigned_to,
             "title": application.title,
             "description": application.description,
-            "remarks": application.remarks,
             "doc_link": application.doc_link,
             "branch_id": application.branch_id
         }).execute()
@@ -111,6 +110,21 @@ async def get_applications_by_applicant(applicant_id: str):
     try:
         supabase = await get_supabase_client()
         response = await supabase.from_('applications').select('*').eq('applicant_id', applicant_id).execute()
+        
+        applications = response.data or []
+        
+        if not applications:
+            return {"applications": [], "message": "No applications found", "status": 404}
+        
+        return {"applications": applications, "message": "Applications found", "status": 200}
+    
+    except Exception as e:
+        return {"error": "Something went wrong", "message": str(e), "status": 500}
+    
+async def get_pending_applications_by_applicant(applicant_id: str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('applications').select('*').eq('applicant_id', applicant_id).eq('status', 'pending').execute()
         
         applications = response.data or []
         

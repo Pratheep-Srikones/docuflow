@@ -33,3 +33,43 @@ export const Staff = (): Staff => ({
   assigned_applications: 0,
   branch_id: "",
 });
+export interface Application {
+  application_id: string;
+  applicant_id: string;
+  submitted_date: string;
+  status: string;
+  reviewed_by: string;
+  assigned_to: string;
+  title: string;
+  description: string;
+  signed_by: string;
+  signed_date: string;
+  remarks: string;
+  doc_link: string;
+  branch_id: string;
+}
+
+export const Application = (): Application => ({
+  application_id: "",
+  applicant_id: "",
+  submitted_date: "",
+  status: "",
+  reviewed_by: "",
+  assigned_to: "",
+  title: "",
+  description: "",
+  signed_by: "",
+  signed_date: "",
+  remarks: "",
+  doc_link: "",
+  branch_id: "",
+});
+
+export interface Branch {
+  name: string;
+  brach_id: string;
+}
+export const Branch = (): Branch => ({
+  name: "",
+  brach_id: "",
+});

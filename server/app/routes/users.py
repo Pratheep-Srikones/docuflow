@@ -27,3 +27,7 @@ async def update_user(user_id: str, user: user_model.User, response: Response):
 @router.delete("/{user_id}", status_code=200)
 async def delete_user(user_id: str, response: Response):
     return await user_controller.delete_user(user_id, response)
+
+@router.get("/applications/pending/count/{user_id}", status_code=200)
+async def count_pending_applications(user_id: str):
+    return await user_model.count_pending_applications(user_id)

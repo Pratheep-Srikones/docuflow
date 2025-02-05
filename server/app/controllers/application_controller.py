@@ -1,6 +1,7 @@
 from fastapi import status, Response
 
 from app.models import application_model
+from app.models import staff_model
 
 async def get_all_appliactions_assigned_by_status(assigned_to:str,in_status:str,response:Response):
     if not assigned_to or assigned_to.strip() == '':
@@ -109,19 +110,34 @@ async def create_application(application:application_model.Application,response:
     if not application:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"error":"Application data is required"}
-    previous_application_data = await application_model.get_applications_by_applicant(application.applicant_id)
+    previous_application_data = await application_model.get_pending_applications_by_applicant(application.applicant_id)
     if previous_application_data.get("error"):
         response.status_code = previous_application_data.get("status")
         return previous_application_data
     
-    if (previous_application_data.get("applications") and len(previous_application_data.get("applications")) > 0):
+    if (previous_application_data.get("applications") and len(previous_application_data.get("applications")) >= 5):
         for app in previous_application_data.get("applications"):
             if app.get("status") == 'pending':
                 response.status_code = status.HTTP_409_CONFLICT
                 return {"message":"Previous application is pending","error":"Cannot submit multiple applications","status":409}
             
-
+    staff_data = await staff_model.get_staff_with_low_applications_model(application.branch_id)
+    print("staff",staff_data)
+    if staff_data.get("error"):
+        response.status_code = staff_data.get("status")
+        return staff_data
+    if not staff_data.get("staff"):
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"error":"No staff found","status":404}
+    
+    application.assigned_to = staff_data.get("staff").get("staff_id")
+    data = await staff_model.increase_assigned_applications_model(application.assigned_to)
+    if data.get("error"):
+        response.status_code = data.get("status")
+        return data
+    
     application_data = await application_model.create_application_model(application)
+
     if application_data.get("error"):
         response.status_code = application_data.get("status")
         return application_data

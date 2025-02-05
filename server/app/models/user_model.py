@@ -92,3 +92,14 @@ async def delete_user_model(user_id: str):
     except Exception as e:
         logging.error(f"Database error occurred: {e}")
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def count_pending_applications(user_id:str) -> int:
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('applications').select('status').eq('applicant_id', user_id).eq('status', 'pending').execute()
+        
+        return len(response.data)
+    
+    except Exception as e:
+        logging.error(f"Database error occurred: {e}")
+        return -1 
