@@ -1,9 +1,10 @@
 from fastapi import status, Response
 from fastapi.exceptions import HTTPException
+from app.utils.jwt import create_jwt
 
 from app.models import user_model
 from app.utils import hashing
-from server.app.models import staff_model
+from app.models import staff_model
 
 async def user_login(nic: str, password: str, response: Response):
     try:
@@ -23,7 +24,11 @@ async def user_login(nic: str, password: str, response: Response):
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return {"error": "Invalid password"}
 
-        return {"user": user, "message": "User found & login success", "status": 200}
+        user.pop("password", None)
+
+        token = create_jwt({"nic": user.get("nic"), "account": "user"})
+        print("user Token IS HERE: =>=>=>=>=>",token)
+        return {"user": user, "token": token, "message": "User found & login success", "status": 200}
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": str(e)}
@@ -45,8 +50,11 @@ async def staff_login(email: str, password: str, response: Response):
         if not hashing.verify(password, staff.get("password")):
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return {"error": "Invalid password"}
+        
+        staff.pop("password", None)
+        token = create_jwt({"email": staff.get("email"), "account": "staff", "role": staff.get("role"),"job_title": staff.get("job_title")})
 
-        return {"staff": staff, "message": "Staff found & login success", "status": 200}
+        return {"staff": staff,"token":token, "message": "Staff found & login success", "status": 200}
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": str(e)}
@@ -69,6 +77,32 @@ async def user_register(user: user_model.User, response: Response):
         user.password = hashing.hash(user.password)
         user_data = await user_model.create_user_model(user)
         return user_data
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"error": str(e)}
+
+async def staff_register(staff: staff_model.Staff, response: Response):
+    try:
+        if staff is None:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"error": "Staff data is required"}
+        if "@" not in staff.email:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"error": "Invalid email format"}
+        if len(staff.password) < 8:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"error": "Password must be at least 8 characters long"}
+        staff_data = await staff_model.get_staff_by_email_model(staff.email)
+        if staff_data is not None and staff_data.get("staff") is not None:
+            response.status_code = status.HTTP_409_CONFLICT
+            return {"error": "Staff already exists"}
+        staff.password = hashing.hash(staff.password)
+        staff.security_key = hashing.hash(staff.security_key)
+        staff_data = await staff_model.create_staff_model(staff)
+        if staff_data.get("error"):
+            response.status_code = staff_data.get("status")
+            return staff_data
+        return staff_data
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": str(e)}

@@ -1,4 +1,5 @@
 from fastapi import status, Response
+from fastapi.responses import JSONResponse
 from app.models import staff_model
 
 async def get_all_staff_by_branch(branch_id: str, response: Response):
@@ -44,11 +45,15 @@ async def create_staff(staff: staff_model.Staff, response: Response):
     if not staff:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"error": "Staff data is required"}
-    
     staff_data = await staff_model.create_staff_model(staff)
     if staff_data.get("error"):
-        response.status_code = staff_data.get("status")
-        return staff_data
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return JSONResponse(status_code=staff_data.get("status"), content={
+            "error": staff_data.get("error"),
+            "message": staff_data.get("message"),
+            "data": staff_data
+        })
+
     
     return staff_data
 
