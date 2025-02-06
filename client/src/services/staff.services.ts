@@ -24,3 +24,18 @@ export const get_staff_details_by_id = async (staff_id: string) => {
     throw error;
   }
 };
+
+export const validate_security_key = async (security_key: string) => {
+  try {
+    const response = await axiosInstance.post(
+      "staff/validate/" + decrypt(localStorage.getItem("staff_id")!),
+      {
+        security_key,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error while validating security key:", error);
+    throw error;
+  }
+};

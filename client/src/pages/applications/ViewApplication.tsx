@@ -3,9 +3,12 @@ import { useParams } from "react-router-dom";
 import { Application, Staff, User } from "../../types/types";
 import { get_application } from "../../services/application.services";
 import { get_user_details_by_id } from "../../services/user.servies";
-import { notifyError } from "../../utils/notify";
+import { notifyError, notifySuccess } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
-import { get_staff_details_by_id } from "../../services/staff.services";
+import {
+  get_staff_details_by_id,
+  validate_security_key,
+} from "../../services/staff.services";
 import { formatTimestamp } from "../../utils/format";
 
 const ViewApplication = () => {
@@ -13,6 +16,24 @@ const ViewApplication = () => {
   const [application, setApplication] = useState<Application>(Application);
   const [applicant, setApplicant] = useState<User>(User);
   const [reviewer, setReviewer] = useState<Staff>(Staff);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [action, setAction] = useState("");
+  const [securityKey, setSecurityKey] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const handleValidation = async () => {
+    try {
+      const data = await validate_security_key(securityKey);
+      if (data.message === "Invalid security key") {
+        notifyError("Invalid security key");
+      }
+      if (data.message === "Valid security key") {
+        notifySuccess("Security key validated successfully");
+        setIsAuthorized(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const getApplication = async () => {
@@ -56,9 +77,9 @@ const ViewApplication = () => {
   }, [application]);
 
   const handleAction = (action: string) => {
-    alert(`Application ${action}!`);
+    setModalOpen(true);
+    setAction(action);
   };
-
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
       {/* Header */}
@@ -153,25 +174,64 @@ const ViewApplication = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto"
-              onClick={() => handleAction("Approved")}
+              onClick={() => handleAction("approve")}
             >
               Approve
             </button>
             <button
               className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition w-full sm:w-auto"
-              onClick={() => handleAction("Rejected")}
+              onClick={() => handleAction("reject")}
             >
               Reject
             </button>
             <button
               className="bg-yellow-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-yellow-600 transition w-full sm:w-auto"
-              onClick={() => handleAction("Assigned to another staff")}
+              onClick={() => handleAction("assign")}
             >
               Assign to Another Staff
             </button>
           </div>
         </div>
       </main>
+      {modalOpen && (
+        <div className="w-full h-full bg-black/80 fixed top-0 left-0 flex items-center justify-center z-10 overflow-hidden">
+          {!isAuthorized ? (
+            <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900 text-center mb-4">
+                Enter Security Key
+              </h2>
+              <p className="text-gray-700 text-center mb-4">
+                Please enter the security key to proceed.
+              </p>
+
+              <input
+                type="password"
+                value={securityKey}
+                onChange={(e) => setSecurityKey(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                autoComplete="off"
+              />
+
+              <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+                <button
+                  onClick={() => handleValidation()}
+                  className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition w-full sm:w-auto"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition w-full sm:w-auto"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>Authorized content goes here.</div>
+          )}
+        </div>
+      )}
       <ToastContainer />
     </div>
   );
