@@ -1,21 +1,17 @@
-import { useState } from "react";
-import { Staff } from "../../types/types";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
+import { Branch, Staff } from "../../types/types";
 import { staff_register } from "../../services/auth.services";
 import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
+import { getBranches } from "../../services/branch.services";
 
 interface Errors {
   nic?: string;
   email?: string;
 }
 
-const roles = ["administrative", "Manager", "Staff"];
-const branches = [
-  "Head Office",
-  "Branch A",
-  "Branch B",
-  "8db9c2fc-ef3f-4a09-a54d-53e15c0c7858",
-];
+const roles = ["administrative", "clerical"];
 
 const StaffRegister: React.FC = () => {
   const [errors, setErrors] = useState<Errors>({});
@@ -82,6 +78,21 @@ const StaffRegister: React.FC = () => {
 
     setErrors(newErrors);
   };
+
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await getBranches();
+        setBranches(response.branches);
+        console.log("branches: ", branches);
+      } catch (error) {
+        console.error("Error while fetching branches:", error);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-2xl rounded-lg border border-gray-200 transform transition-all duration-300 hover:shadow-3xl">
@@ -341,6 +352,9 @@ const StaffRegister: React.FC = () => {
               setCurrStaff({ ...currStaff, role: e.target.value })
             }
           >
+            <option value="" disabled>
+              Select Role
+            </option>
             {roles.map((role) => (
               <option key={role} value={role}>
                 {role}
@@ -360,8 +374,8 @@ const StaffRegister: React.FC = () => {
             }
           >
             {branches.map((branch) => (
-              <option key={branch} value={branch}>
-                {branch}
+              <option key={branch.brach_id} value={branch.brach_id}>
+                {branch.name}
               </option>
             ))}
           </select>

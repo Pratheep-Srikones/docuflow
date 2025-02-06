@@ -7,6 +7,7 @@ import StaffRegister from "./pages/auth/StaffRegister";
 import UserDashboard from "./pages/dashboard/UserDashboard";
 import StaffDashboard from "./pages/dashboard/StaffDashboard";
 import AddApplication from "./pages/applications/AddApplication";
+import ViewApplication from "./pages/applications/ViewApplication";
 
 const App = () => {
   return (
@@ -19,6 +20,10 @@ const App = () => {
       <Route path="user/" element={<UserDashboard />} />
       <Route path="staff/" element={<StaffDashboard />} />
       <Route path="user/application/add" element={<AddApplication />} />
+      <Route
+        path="staff/application/:application_id"
+        element={<ViewApplication />}
+      />
     </Routes>
   );
 };

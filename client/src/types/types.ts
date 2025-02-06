@@ -7,6 +7,15 @@ export interface User {
   password: string;
 }
 
+export const User = (): User => ({
+  first_name: "",
+  last_name: "",
+  phone: "",
+  email: "",
+  nic: "",
+  password: "",
+});
+
 export interface Staff {
   first_name: string;
   last_name: string;

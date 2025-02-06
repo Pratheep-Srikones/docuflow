@@ -2,8 +2,10 @@ import { useState } from "react";
 import { staff_login } from "../../services/auth.services";
 import { notifyError, notifySuccess } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const StaffLogin = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +23,7 @@ const StaffLogin = () => {
         .then((response) => {
           console.log(response);
           notifySuccess("Logged in successfully");
+          navigate("/staff/");
         })
         .catch((error) => {
           console.error("Error while logging in staff:", error);

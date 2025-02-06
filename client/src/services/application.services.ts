@@ -37,3 +37,13 @@ export const get_applications_by_applicant = async () => {
     throw error;
   }
 };
+
+export const get_application = async (application_id: string) => {
+  try {
+    const response = await axiosInstance.get("applications/" + application_id);
+    return response.data;
+  } catch (error) {
+    console.error("Error while getting application:", error);
+    throw error;
+  }
+};

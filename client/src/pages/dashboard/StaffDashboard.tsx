@@ -1,27 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { decrypt } from "../../utils/encrypt";
+import { Application } from "../../types/types";
+import { get_pending_applications } from "../../services/staff.services";
 
 const StaffDashboard = () => {
-  const [assignedApplications] = useState([
-    { id: 1, title: "Document 1", status: "Pending" },
-    { id: 2, title: "Document 2", status: "Under Review" },
-  ]);
-
-  const [staffDetails] = useState({
-    firstName: "Jane",
-    lastName: "Smith",
-    jobTitle: "Review Officer",
-    email: "janesmith@example.com",
-    phone: "987-654-3210",
-  });
-
   const navigate = useNavigate();
 
-  const handleViewApplicationDetails = (applicationId: number) => {
+  const handleViewApplicationDetails = (applicationId: string) => {
     navigate(`/staff/application/${applicationId}`); // Route to application details page
   };
 
   const handleLogOut = () => {
+    localStorage.clear(); // Clear local storage
     navigate("/"); // Route to log out
   };
 
@@ -29,10 +20,21 @@ const StaffDashboard = () => {
     navigate("/staff/change-password"); // Route to change password page
   };
 
-  const handleEditProfile = () => {
-    navigate("/staff/edit-profile"); // Route to edit profile page
-  };
+  const [assignedApplications, setAssignedApplications] = useState<
+    Application[]
+  >([]);
 
+  useEffect(() => {
+    const getPendingApplications = async () => {
+      try {
+        const data = await get_pending_applications();
+        setAssignedApplications(data.applications); // Call get_pending_applications function
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getPendingApplications();
+  });
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -47,8 +49,8 @@ const StaffDashboard = () => {
         {/* Welcome Message */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-semibold text-gray-800">
-            Welcome, {staffDetails.firstName} {staffDetails.lastName} (
-            {staffDetails.jobTitle})
+            Welcome, {decrypt(localStorage.getItem("staff_name")!)}! (
+            {decrypt(localStorage.getItem("staff_job_title")!)})
           </h2>
         </div>
 
@@ -77,13 +79,15 @@ const StaffDashboard = () => {
                 </thead>
                 <tbody>
                   {assignedApplications.map((application) => (
-                    <tr key={application.id} className="border-b">
+                    <tr key={application.application_id} className="border-b">
                       <td className="px-4 py-2">{application.title}</td>
                       <td className="px-4 py-2">{application.status}</td>
                       <td className="px-4 py-2">
                         <button
                           onClick={() =>
-                            handleViewApplicationDetails(application.id)
+                            handleViewApplicationDetails(
+                              application.application_id
+                            )
                           }
                           className="text-blue-500 hover:text-blue-700"
                         >
@@ -105,10 +109,16 @@ const StaffDashboard = () => {
           </h3>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <p>
-              <strong>Email:</strong> {staffDetails.email}
+              <strong>Email:</strong>{" "}
+              {decrypt(localStorage.getItem("staff_email")!)}
             </p>
             <p>
-              <strong>Phone:</strong> {staffDetails.phone}
+              <strong>Phone:</strong>{" "}
+              {decrypt(localStorage.getItem("staff_phone")!)}
+            </p>
+            <p>
+              <strong>NIC:</strong>{" "}
+              {decrypt(localStorage.getItem("staff_nic")!)}
             </p>
           </div>
         </div>
@@ -135,12 +145,6 @@ const StaffDashboard = () => {
 
         {/* Actions */}
         <div className="text-center space-x-4">
-          <button
-            onClick={handleEditProfile}
-            className="bg-purple-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-600 transition"
-          >
-            Edit Profile
-          </button>
           <button
             onClick={handleChangePassword}
             className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition"
