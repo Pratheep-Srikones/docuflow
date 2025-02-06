@@ -2,6 +2,7 @@ import { useState } from "react";
 import { User } from "../../types/types";
 import { user_register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
+import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
 
 const UserRegister = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -20,10 +21,7 @@ const UserRegister = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validNIC || !validEmail) {
-      alert("Please enter valid NIC and email address!");
-      return;
-    }
+
     if (
       !currUser.first_name ||
       !currUser.last_name ||
@@ -31,18 +29,22 @@ const UserRegister = () => {
       !currUser.email ||
       !currUser.password
     ) {
-      alert("Please fill all the fields!");
+      notifyWarning("Please fill all the fields!");
+      return;
+    }
+    if (!validNIC || !validEmail) {
+      notifyWarning("Please enter valid NIC and email address!");
       return;
     }
     user_register(currUser)
       .then((data) => {
         console.log(data);
-        alert("User registered successfully!");
+        notifySuccess("User registered successfully!");
         navigate("/user/auth/login");
       })
       .catch((error) => {
         console.error("Error while registering user:", error);
-        alert("Error while registering user!");
+        notifyError("Error while registering user!");
       });
   };
 

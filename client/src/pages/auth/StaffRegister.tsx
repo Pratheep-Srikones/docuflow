@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Staff } from "../../types/types";
 import { staff_register } from "../../services/auth.services";
+import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
 
 interface Errors {
   nic?: string;
@@ -36,22 +37,22 @@ const StaffRegister: React.FC = () => {
       !currStaff.job_title ||
       !currStaff.branch_id
     ) {
-      alert("Please fill all fields");
+      notifyWarning("Please fill all fields");
       return;
     }
     if (currStaff.password === currStaff.security_key) {
-      alert("Password and Security Key cannot be the same");
+      notifyWarning("Password and Security Key cannot be the same");
       return;
     }
     try {
       staff_register(currStaff)
         .then((response) => {
           console.log(response);
-          alert("Staff registered successfully");
+          notifySuccess("Staff registered successfully");
         })
         .catch((error) => {
           console.error("Error while registering staff:", error);
-          alert("Error while registering staff");
+          notifyError("Error while registering staff");
         });
     } catch (error) {
       console.error("Error while registering staff:", error);

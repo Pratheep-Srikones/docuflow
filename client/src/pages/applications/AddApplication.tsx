@@ -4,6 +4,8 @@ import { Application, Branch } from "../../types/types";
 import { submit_application } from "../../services/application.services";
 import { useNavigate } from "react-router-dom";
 import { getBranches } from "../../services/branch.services";
+import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
+import { ToastContainer } from "react-toastify";
 
 const AddApplication = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -31,12 +33,12 @@ const AddApplication = () => {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      alert("Please upload a PDF file.");
+      notifyWarning("Please upload a PDF file.");
     } else {
       uploadFile(file)
         .then((response) => {
           console.log("response of upload: ", response);
-          alert("File uploaded successfully!");
+          notifySuccess("File uploaded successfully!");
           setFileUploaded(true);
           setCurrApplication({
             ...currApplication,
@@ -45,7 +47,7 @@ const AddApplication = () => {
         })
         .catch((error) => {
           console.log("error of upload: ", error);
-          alert("Error uploading file. Please try again.");
+          notifyError("Error uploading file. Please try again.");
         });
     }
   };
@@ -53,9 +55,9 @@ const AddApplication = () => {
   const handleSubmission = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fileUploaded) {
-      alert("Please upload a PDF file.");
+      notifyWarning("Please upload a PDF file.");
     } else if (!currApplication.title || !currApplication.description) {
-      alert("Please fill in all the fields.");
+      notifyWarning("Please fill in all the fields.");
     } else {
       setCurrApplication({
         ...currApplication,
@@ -67,12 +69,12 @@ const AddApplication = () => {
       submit_application(currApplication)
         .then((response) => {
           console.log("response of submission: ", response);
-          alert("Application submitted successfully!");
+          notifySuccess("Application submitted successfully!");
           navigate("/user");
         })
         .catch((error) => {
           console.log("error of submission: ", error);
-          alert("Error submitting application. Please try again.");
+          notifySuccess("Error submitting application. Please try again.");
         });
     }
   };
@@ -81,7 +83,7 @@ const AddApplication = () => {
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
     } else {
-      alert("Only PDF files are allowed.");
+      notifyWarning("Only PDF files are allowed.");
     }
   };
 
@@ -91,17 +93,7 @@ const AddApplication = () => {
     if (droppedFile && droppedFile.type === "application/pdf") {
       setFile(droppedFile);
     } else {
-      alert("Only PDF files are allowed.");
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle the form submission logic here (e.g., send data to the backend)
-    if (!file) {
-      alert("Please upload a PDF file.");
-    } else {
-      alert("Application submitted successfully!");
+      notifyWarning("Only PDF files are allowed.");
     }
   };
 
@@ -117,7 +109,7 @@ const AddApplication = () => {
 
       <main className="flex-grow px-6 md:px-8 py-12">
         <div className="max-w-lg mx-auto">
-          <form onSubmit={handleSubmit}>
+          <form>
             {/* Title Input */}
             <div className="mb-4">
               <input
@@ -290,6 +282,7 @@ const AddApplication = () => {
           </form>
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };

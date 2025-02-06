@@ -5,6 +5,7 @@ import {
   get_applications_count,
 } from "../../services/application.services";
 import { Application } from "../../types/types";
+import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
 
 const UserDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -30,9 +31,9 @@ const UserDashboard = () => {
     e.preventDefault();
     // Implement password change logic here
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match!");
+      notifyWarning("Passwords do not match!");
     } else {
-      alert("Password changed successfully!");
+      notifySuccess("Password changed successfully!");
     }
   };
 
@@ -40,7 +41,7 @@ const UserDashboard = () => {
 
   const handleAddApplication = async () => {
     if ((await get_applications_count()) >= 5) {
-      alert("You already have some pending applications try again.");
+      notifyError("You already have some pending applications try again.");
       return;
     }
     navigate("/user/application/add"); // Route to add application page

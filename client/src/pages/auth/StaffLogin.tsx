@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { staff_login } from "../../services/auth.services";
+import { notifyError, notifySuccess } from "../../utils/notify";
 
 const StaffLogin = () => {
   const [email, setEmail] = useState("");
@@ -18,11 +19,11 @@ const StaffLogin = () => {
       staff_login(email, password)
         .then((response) => {
           console.log(response);
-          alert("Logged in successfully");
+          notifySuccess("Logged in successfully");
         })
         .catch((error) => {
           console.error("Error while logging in staff:", error);
-          alert("Failed to login");
+          notifyError("Failed to login");
         });
     } catch (error) {
       console.error("Error while logging in staff:", error);

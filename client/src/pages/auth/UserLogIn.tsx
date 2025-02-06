@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { user_login } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
+import { notifyError, notifySuccess } from "../../utils/notify";
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -15,12 +16,12 @@ const UserLogin = () => {
       user_login(nic, password)
         .then((res) => {
           console.log(res);
-          alert("Login Successful");
+          notifySuccess("Login Successful");
           navigate("/user/");
         })
         .catch((error) => {
           console.log(error);
-          alert("Login Failed");
+          notifyError("Login Failed");
         });
     } catch (error) {
       console.error("Error while logging in user:", error);
