@@ -2,6 +2,7 @@ import { useState } from "react";
 import { user_login } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/notify";
+import { ToastContainer } from "react-toastify";
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -137,6 +138,7 @@ const UserLogin = () => {
           </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };

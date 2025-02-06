@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { getBranches } from "../../services/branch.services";
 import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
+import { decrypt } from "../../utils/encrypt";
 
 const AddApplication = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -62,7 +63,7 @@ const AddApplication = () => {
       setCurrApplication({
         ...currApplication,
         submitted_date: new Date().toISOString(),
-        applicant_id: localStorage.getItem("user_id")!,
+        applicant_id: decrypt(localStorage.getItem("user_id")!),
         status: "pending",
       });
 
@@ -103,7 +104,10 @@ const AddApplication = () => {
         <h1 className="text-3xl font-semibold text-center">
           Add New Application
         </h1>
-        <p className="mt-2 text-lg text-center">Welcome, John Doe</p>{" "}
+        <p className="mt-2 text-lg text-center">
+          Welcome, {decrypt(localStorage.getItem("user_name")!)}
+          {"!"}
+        </p>{" "}
         {/* Replace with dynamic user name */}
       </header>
 

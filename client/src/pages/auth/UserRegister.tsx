@@ -3,6 +3,7 @@ import { User } from "../../types/types";
 import { user_register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
+import { ToastContainer } from "react-toastify";
 
 const UserRegister = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -241,6 +242,7 @@ const UserRegister = () => {
           />
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

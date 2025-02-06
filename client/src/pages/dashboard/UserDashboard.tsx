@@ -6,6 +6,9 @@ import {
 } from "../../services/application.services";
 import { Application } from "../../types/types";
 import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
+import { user_password_change } from "../../services/auth.services";
+import { ToastContainer } from "react-toastify";
+import { decrypt } from "../../utils/encrypt";
 
 const UserDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -27,13 +30,21 @@ const UserDashboard = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     // Implement password change logic here
     if (newPassword !== confirmPassword) {
       notifyWarning("Passwords do not match!");
     } else {
-      notifySuccess("Password changed successfully!");
+      user_password_change(oldPassword, newPassword)
+        .then(() => {
+          notifySuccess("Password changed successfully!");
+          setModalOpen(false);
+        })
+        .catch((error) => {
+          notifyError("Error while changing password!");
+          console.error("Error while changing password:", error);
+        });
     }
   };
 
@@ -70,7 +81,7 @@ const UserDashboard = () => {
         {/* Welcome Message */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-semibold text-gray-800">
-            Welcome, {localStorage.getItem("user_name")}!
+            Welcome, {decrypt(localStorage.getItem("user_name")!)}!
           </h2>
         </div>
 
@@ -122,13 +133,13 @@ const UserDashboard = () => {
           </h3>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <p>
-              <strong>Email:</strong> {localStorage.getItem("email")}
+              <strong>Email:</strong> {decrypt(localStorage.getItem("email")!)}
             </p>
             <p>
-              <strong>Phone:</strong> {localStorage.getItem("phone")}
+              <strong>Phone:</strong> {decrypt(localStorage.getItem("phone")!)}
             </p>
             <p>
-              <strong>NIC:</strong> {localStorage.getItem("nic")}
+              <strong>NIC:</strong> {decrypt(localStorage.getItem("nic")!)}
             </p>
           </div>
         </div>
@@ -211,6 +222,7 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 };

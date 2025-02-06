@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { staff_login } from "../../services/auth.services";
 import { notifyError, notifySuccess } from "../../utils/notify";
+import { ToastContainer } from "react-toastify";
 
 const StaffLogin = () => {
   const [email, setEmail] = useState("");
@@ -134,6 +135,7 @@ const StaffLogin = () => {
           </button>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };

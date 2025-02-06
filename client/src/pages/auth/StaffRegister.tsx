@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Staff } from "../../types/types";
 import { staff_register } from "../../services/auth.services";
 import { notifyError, notifySuccess, notifyWarning } from "../../utils/notify";
+import { ToastContainer } from "react-toastify";
 
 interface Errors {
   nic?: string;
@@ -390,6 +391,7 @@ const StaffRegister: React.FC = () => {
           Register
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 };
