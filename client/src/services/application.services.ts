@@ -47,3 +47,21 @@ export const get_application = async (application_id: string) => {
     throw error;
   }
 };
+
+export const assign_application = async (
+  application_id: string,
+  assigned_to: string
+) => {
+  try {
+    const response = await axiosInstance.put(
+      "applications/" + application_id + "/assign/" + assigned_to,
+      {
+        old_assignee_id: decrypt(localStorage.getItem("staff_id")!),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error assigning Staff:", error);
+    throw error;
+  }
+};

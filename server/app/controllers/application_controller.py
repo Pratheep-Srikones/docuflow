@@ -87,7 +87,7 @@ async def update_application_reviewed_by(application_id:str,reviewed_by:str,resp
         return application_data
     return application_data
 
-async def assign_application(application_id:str,assigned_to:str,response:Response):
+async def assign_application(application_id:str,assigned_to:str,old_assignee_id:str ,response:Response):
     if not application_id or application_id.strip() == '':
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"error":"Application ID is required"}
@@ -104,6 +104,10 @@ async def assign_application(application_id:str,assigned_to:str,response:Respons
     if application_data.get("error"):
         response.status_code = application_data.get("status")
         return application_data
+    reduced_data = await staff_model.decrease_assigned_applications_model(old_assignee_id)
+    if reduced_data.get("error"):
+        response.status_code = reduced_data.get("status")
+        return reduced_data
     return application_data
 
 async def create_application(application:application_model.Application,response:Response):

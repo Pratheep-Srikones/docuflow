@@ -39,3 +39,13 @@ export const validate_security_key = async (security_key: string) => {
     throw error;
   }
 };
+
+export const get_all_staff_by_branch = async (branch_id: string) => {
+  try {
+    const response = await axiosInstance.get("staff/branch/" + branch_id);
+    return response.data;
+  } catch (error) {
+    console.error("Error while validating security key:", error);
+    throw error;
+  }
+};

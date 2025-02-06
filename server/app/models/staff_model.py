@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from db.supabase import create_supabase_client
+from app.utils import hashing
 
 class Staff(BaseModel):
     first_name: str
@@ -20,7 +21,7 @@ async def get_supabase_client():
 async def get_all_staff_by_branch_model(branch_id: str):
     try:
         supabase = await get_supabase_client()
-        response = await supabase.from_('staff').select('*').eq('branch_id', branch_id).execute()
+        response = await supabase.from_('staff').select('first_name', 'last_name', 'staff_id', 'role', 'job_title').eq('branch_id', branch_id).execute()
         
         staff = response.data or []
         
@@ -36,6 +37,19 @@ async def get_staff_by_id_model(staff_id: str):
     try:
         supabase = await get_supabase_client()
         response = await supabase.from_('staff').select('*').eq('staff_id', staff_id).execute()
+        
+        if not response.data:
+            return {"error": "Staff not found", "status": 404}
+        
+        return {"staff": response.data[0], "message": "Staff found", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def get_staff_details_by_id_model(staff_id:str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('staff').select('first_name','last_name','role','job_title').eq('staff_id', staff_id).execute()
         
         if not response.data:
             return {"error": "Staff not found", "status": 404}
@@ -101,7 +115,7 @@ async def get_staff_with_low_applications_model(branch_id: str):
     except Exception as e:
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
     
-async def increase_assigned_applications_model(staff_id):
+async def increase_assigned_applications_model(staff_id:str):
     try:
         supabase = await get_supabase_client()
         response = await supabase.from_('staff').select('assigned_applications').eq('staff_id', staff_id).execute()
@@ -111,6 +125,37 @@ async def increase_assigned_applications_model(staff_id):
         response = await supabase.from_('staff').update({"assigned_applications": assigned_applications + 1}).eq('staff_id', staff_id).execute()
         
         return {"message": "Assigned applications updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
+async def decrease_assigned_applications_model(staff_id:str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('staff').select('assigned_applications').eq('staff_id', staff_id).execute()
+        
+        assigned_applications = response.data[0]['assigned_applications']
+        
+        response = await supabase.from_('staff').update({"assigned_applications": assigned_applications - 1}).eq('staff_id', staff_id).execute()
+        
+        return {"message": "Assigned applications updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def validate_security_key_model(staff_id: str, security_key: str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('staff').select('security_key').eq('staff_id', staff_id).execute()
+        
+        if not response.data:
+            return {"error": "Staff not found", "status": 404}
+        
+        isValid = hashing.verify(security_key, response.data[0]['security_key'])
+
+        if not isValid:
+            return {"message": "Invalid security key", "status": 401}
+        
+        return {"message": "Valid security key", "status": 200}
     
     except Exception as e:
         return {"error": str(e), "message": "Internal Server Error", "status": 500}

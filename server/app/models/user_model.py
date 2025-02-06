@@ -43,6 +43,20 @@ async def get_user_by_id_model(user_id: str):
     except Exception as e:
         logging.error(f"Database error occurred: {e}")
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def get_user_details_by_id_model(user_id: str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('users').select('first_name','last_name','phone','email','nic').eq('user_id', user_id).execute()
+        
+        if not response.data:
+            return {"error": "User not found", "status": 404}
+        
+        return {"user": response.data[0], "message": "User found", "status": 200}
+    
+    except Exception as e:
+        logging.error(f"Database error occurred: {e}")
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
 
 async def get_user_by_nic_model(nic: str):
     try:
@@ -103,3 +117,13 @@ async def count_pending_applications(user_id:str) -> int:
     except Exception as e:
         logging.error(f"Database error occurred: {e}")
         return -1 
+    
+async def change_password_model(user_id:str,new_password:str):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('users').update({"password":new_password}).eq('user_id', user_id).execute()
+
+        return {"message": "Password updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}

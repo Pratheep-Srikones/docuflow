@@ -1,17 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Application, Staff, User } from "../../types/types";
-import { get_application } from "../../services/application.services";
+import { useNavigate, useParams } from "react-router-dom";
+import { Application, Staff, StaffDetail, User } from "../../types/types";
+import {
+  assign_application,
+  get_application,
+} from "../../services/application.services";
 import { get_user_details_by_id } from "../../services/user.servies";
 import { notifyError, notifySuccess } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
 import {
+  get_all_staff_by_branch,
   get_staff_details_by_id,
   validate_security_key,
 } from "../../services/staff.services";
 import { formatTimestamp } from "../../utils/format";
 
 const ViewApplication = () => {
+  const navigate = useNavigate();
   const { application_id } = useParams();
   const [application, setApplication] = useState<Application>(Application);
   const [applicant, setApplicant] = useState<User>(User);
@@ -19,7 +25,9 @@ const ViewApplication = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [action, setAction] = useState("");
   const [securityKey, setSecurityKey] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
+
+  const [staffs, setStaffs] = useState<StaffDetail[]>([]);
   const handleValidation = async () => {
     try {
       const data = await validate_security_key(securityKey);
@@ -34,7 +42,19 @@ const ViewApplication = () => {
       console.error(error);
     }
   };
-
+  useEffect(() => {
+    const fetchStaffs = async () => {
+      if (action === "assign" && application.branch_id) {
+        try {
+          const data = await get_all_staff_by_branch(application.branch_id);
+          setStaffs(data.staff);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchStaffs();
+  }, [action, application]);
   useEffect(() => {
     const getApplication = async () => {
       try {
@@ -79,6 +99,22 @@ const ViewApplication = () => {
   const handleAction = (action: string) => {
     setModalOpen(true);
     setAction(action);
+  };
+
+  const handle_assign_staff = async () => {
+    try {
+      assign_application(application.application_id, application.assigned_to)
+        .then(() => {
+          notifySuccess("Successfully assigned");
+          navigate("/staff");
+        })
+        .catch((error) => {
+          console.error(error);
+          notifyError("Error assigning");
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
@@ -228,7 +264,114 @@ const ViewApplication = () => {
               </div>
             </div>
           ) : (
-            <div>Authorized content goes here.</div>
+            <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md mx-auto">
+              {action === "approve" && (
+                <>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900 text-center mb-4">
+                    Approve Application
+                  </h2>
+                  <p className="text-gray-700 text-center mb-4">
+                    Are you sure you want to approve{" "}
+                    <span className="font-semibold">{application.title}</span>{" "}
+                    submitted by{" "}
+                    <span className="font-semibold">
+                      {applicant.first_name} {applicant.last_name}
+                    </span>
+                    ?
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+                    <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto">
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => setModalOpen(false)}
+                      className="bg-gray-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-600 transition w-full sm:w-auto"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {action === "reject" && (
+                <>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900 text-center mb-4">
+                    Reject Application
+                  </h2>
+                  <p className="text-gray-700 text-center mb-4">
+                    Are you sure you want to reject{" "}
+                    <span className="font-semibold">{application.title}</span>{" "}
+                    submitted by{" "}
+                    <span className="font-semibold">
+                      {applicant.first_name} {applicant.last_name}
+                    </span>
+                    ?
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+                    <button className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition w-full sm:w-auto">
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => setModalOpen(false)}
+                      className="bg-gray-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-600 transition w-full sm:w-auto"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {action === "assign" && (
+                <>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900 text-center mb-4">
+                    Assign Application
+                  </h2>
+                  <p className="text-gray-700 text-center mb-4">
+                    Select a staff member to assign this application.
+                  </p>
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Staff to Assign
+                    </label>
+                    <select
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      onChange={(e) =>
+                        setApplication({
+                          ...application,
+                          assigned_to: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="" disabled selected>
+                        Select Staff
+                      </option>
+                      {staffs.map((staff) => (
+                        <option key={staff.staff_id} value={staff.staff_id}>
+                          {staff.first_name} {staff.last_name} -{" "}
+                          {staff.job_title} ({staff.role})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+                    <button
+                      onClick={() => {
+                        handle_assign_staff();
+                      }}
+                      className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition w-full sm:w-auto"
+                    >
+                      Assign
+                    </button>
+                    <button
+                      onClick={() => setModalOpen(false)}
+                      className="bg-gray-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-600 transition w-full sm:w-auto"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       )}

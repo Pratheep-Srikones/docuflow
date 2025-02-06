@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Response
+from pydantic import BaseModel
 from app.controllers import staff_controller
 from app.models import staff_model
 
 router = APIRouter()
+
+class ValidateRequest(BaseModel):
+    security_key: str
 
 @router.get("/branch/{branch_id}", status_code=200)
 async def get_all_staff_by_branch(branch_id: str, response: Response):
@@ -11,6 +15,10 @@ async def get_all_staff_by_branch(branch_id: str, response: Response):
 @router.get("/{staff_id}", status_code=200)
 async def get_staff_by_id(staff_id: str, response: Response):
     return await staff_controller.get_staff_by_id(staff_id, response)
+
+@router.get("/details/{staff_id}", status_code=200)
+async def get_staff_details_by_id(staff_id: str, response: Response):
+    return await staff_controller.get_staff_details_by_id(staff_id, response)
 
 @router.get("/email/{email}", status_code=200)
 async def get_staff_by_email(email: str, response: Response):
@@ -27,3 +35,7 @@ async def update_staff(staff_id: str, staff: staff_model.Staff, response: Respon
 @router.delete("/{staff_id}", status_code=200)
 async def delete_staff(staff_id: str, response: Response):
     return await staff_controller.delete_staff(staff_id, response)
+
+@router.post("/validate/{staff_id}", status_code=200)
+async def validate_security_key(staff_id: str,request:ValidateRequest, response: Response):
+    return await staff_controller.validate_security_key(staff_id, request.security_key, response)

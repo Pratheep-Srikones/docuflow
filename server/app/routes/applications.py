@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Response
 from datetime import datetime
+
+from pydantic import BaseModel
 from app.controllers import application_controller
 from app.models import application_model
 
 router = APIRouter()
+
+class AssignRequest(BaseModel):
+    old_assignee_id : str
 
 @router.get("/assigned/{assigned_to}/{status}", status_code=200)
 async def get_applications_assigned_by_status(assigned_to: str, status: str, response: Response):
@@ -22,8 +27,8 @@ async def update_application_status(application_id: str, status: str, response: 
     return await application_controller.update_application_status(application_id, status, response)
 
 @router.put("/{application_id}/assign/{assigned_to}", status_code=200)
-async def assign_application(application_id: str, assigned_to: str, response: Response):
-    return await application_controller.assign_application(application_id, assigned_to, response)
+async def assign_application(application_id: str, assigned_to: str,request:AssignRequest, response: Response):
+    return await application_controller.assign_application(application_id, assigned_to,request.old_assignee_id,response)
 
 @router.post("/", status_code=201)
 async def create_application(application: application_model.Application, response: Response):

@@ -82,3 +82,11 @@ export const Branch = (): Branch => ({
   name: "",
   brach_id: "",
 });
+
+export interface StaffDetail {
+  staff_id: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  job_title: string;
+}

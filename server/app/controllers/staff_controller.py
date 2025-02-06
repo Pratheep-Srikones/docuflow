@@ -29,6 +29,21 @@ async def get_staff_by_id(staff_id: str, response: Response):
     
     return staff_data
 
+async def get_staff_details_by_id(staff_id: str, response: Response):
+    if not staff_id or staff_id.strip() == "":
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Staff ID is required"}
+    if len(staff_id) != 36:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Invalid staff ID format"}
+    
+    staff_data = await staff_model.get_staff_details_by_id_model(staff_id)
+    if staff_data.get("error"):
+        response.status_code = staff_data.get("status")
+        return staff_data
+    
+    return staff_data
+
 async def get_staff_by_email(email: str, response: Response):
     if not email or email.strip() == "":
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -86,3 +101,23 @@ async def delete_staff(staff_id: str, response: Response):
         return staff_data
     
     return staff_data
+
+async def validate_security_key(staff_id: str, security_key: str, response: Response):
+    if not staff_id or staff_id.strip() == "":
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Staff ID is required"}
+    if len(staff_id) != 36:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Invalid staff ID format"}
+    if not security_key or security_key.strip() == "":
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": "Security key is required"}
+    
+    staff_data = await staff_model.validate_security_key_model(staff_id, security_key)
+    if staff_data.get("error"):
+        response.status_code = staff_data.get("status")
+        return staff_data
+    
+    return staff_data
+
+    

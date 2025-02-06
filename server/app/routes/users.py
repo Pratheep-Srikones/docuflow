@@ -12,6 +12,10 @@ async def get_users():
 async def get_user(user_id: str, response: Response):
     return await user_controller.get_user_by_id(user_id, response)
 
+@router.get("/details/{user_id}", status_code=200)
+async def get_user_details(user_id: str, response: Response):
+    return await user_controller.get_user_details(user_id, response)
+
 @router.get("/nic/{nic}", status_code=200)
 async def get_user_by_nic(nic: str, response: Response):
     return await user_controller.get_user_by_nic(nic, response)
