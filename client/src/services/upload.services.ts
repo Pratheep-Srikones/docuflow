@@ -21,3 +21,21 @@ export const uploadFile = async (file: File) => {
     throw error;
   }
 };
+
+export const sign_pdf = async (
+  pdf_url: string,
+  text: string,
+  status: string
+) => {
+  try {
+    const response = await axiosInstance.post("/pdf/sign", {
+      pdf_url,
+      text,
+      status,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error while signing pdf:", error);
+    throw error;
+  }
+};

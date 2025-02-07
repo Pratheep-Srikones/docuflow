@@ -15,6 +15,8 @@ import {
   validate_security_key,
 } from "../../services/staff.services";
 import { formatTimestamp } from "../../utils/format";
+import { sign_pdf } from "../../services/upload.services";
+import { decrypt } from "../../utils/encrypt";
 
 const ViewApplication = () => {
   const navigate = useNavigate();
@@ -115,6 +117,19 @@ const ViewApplication = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleApproval = async () => {
+    sign_pdf(application.doc_link, "Approved", "Approved").then((res) => {
+      notifySuccess("Application Approved Successfully");
+      setApplication({
+        ...application,
+        status: "Approved",
+        doc_link: res.file_url,
+        signed_by: decrypt(localStorage.getItem("staff_id")!),
+        signed_date: new Date().toISOString(),
+      });
+    });
   };
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
@@ -280,7 +295,10 @@ const ViewApplication = () => {
                     ?
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-                    <button className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto">
+                    <button
+                      onClick={handleApproval}
+                      className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 transition w-full sm:w-auto"
+                    >
                       Approve
                     </button>
                     <button

@@ -6,32 +6,12 @@ import random
 import string
 
 BUCKET_NAME = "documents"
-def generate_random_string(length=4):
-    letters = string.ascii_letters
-    return ''.join(random.choice(letters) for i in range(length))
 
-async def upload_pdf_to_supabase_storage(applicant_id: str, response:Response, file: UploadFile = File(...)):
-    if file.content_type != "application/pdf":
-        return {"error": "Only PDF files allowed", "status": 400}
-    
-    # Generate a unique file name if not provided
 
-    applicant = await get_user_by_id(applicant_id,response)
-    applicant = applicant.get("user")
-    print("APPLICANT->",applicant)
-
-    if applicant is None:
-        return {"error": "Applicant not found", "status": 404}
-    
-    
-    if applicant.get("nic") is None:
-        return {"error": "Applicant NIC not found", "status": 404}
-    
-    file_name = applicant.get("nic") + generate_random_string(4)+ ".pdf"
-    file_name = file_name.lstrip("/")
+async def upload_pdf_to_supabase_storage(file_name:str, file: UploadFile = File(...)):
 
     supabase = await create_supabase_client()
-    file_bytes = await file.read()
+    file_bytes = file.read()
 
     try:
         # Upload file to Supabase Storage
@@ -59,3 +39,14 @@ async def upload_pdf_to_supabase_storage(applicant_id: str, response:Response, f
     
     except Exception as e:
         return {"error": str(e), "status": 500, "message": "Error uploading file to Supabase Storage"}
+
+async def delete_file_from_supabase_storage(file_name:str):
+    supabase = await create_supabase_client()
+    try:
+        # Delete file from Supabase Storage
+        response = await supabase.storage.from_(BUCKET_NAME).remove([file_name])
+        if response is None:  # Supabase might return None if delete fails
+            raise ValueError("Delete response is None")
+        return {"status": 200, "message": "File deleted successfully"}
+    except Exception as e:
+        return {"error": str(e), "status": 500, "message": "Error deleting file from Supabase Storage"}
