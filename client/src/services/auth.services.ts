@@ -97,3 +97,24 @@ export const user_password_change = async (
     throw error;
   }
 };
+
+export const staff_password_change = async (
+  old_password: string,
+  new_password: string
+) => {
+  try {
+    const response = await axiosInstance.post(
+      "/auth/staff/password/change/" +
+        decrypt(localStorage.getItem("staff_id")!),
+      {
+        old_password,
+        new_password,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error while changing password:", error);
+    throw error;
+  }
+};

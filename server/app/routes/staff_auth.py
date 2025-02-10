@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
-from app.controllers import auth_controller
+from app.controllers import auth_controller,staff_controller
 from fastapi.security import OAuth2PasswordBearer
 
 from app.models import staff_model
 router = APIRouter()
 
+class changePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
 class StaffLoginRequest(BaseModel):
     email: str
     password: str
@@ -27,3 +30,10 @@ async def staff_login(request: StaffLoginRequest, response: Response):
 @router.post("/register", status_code=201)
 async def staff_register(staff: staff_model.Staff, response: Response):
     return await auth_controller.staff_register(staff, response)
+
+
+
+@router.post("/password/change/{staff_id}", status_code=200)
+async def change_password(staff_id: str, request: changePasswordRequest ,response: Response):
+    print("change password")
+    return await staff_controller.change_staff_password(staff_id, request.old_password, request.new_password, response)

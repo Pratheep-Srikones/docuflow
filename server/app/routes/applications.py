@@ -26,6 +26,10 @@ async def get_application_by_id(application_id: str, response: Response):
 async def update_application_status(application_id: str, status: str, response: Response):
     return await application_controller.update_application_status(application_id, status, response)
 
+@router.put("/{application_id}", status_code=200)
+async def update_application(application_id: str, application: application_model.Application, response: Response):
+    return await application_controller.update_application(application_id, application, response)
+
 @router.put("/{application_id}/assign/{assigned_to}", status_code=200)
 async def assign_application(application_id: str, assigned_to: str,request:AssignRequest, response: Response):
     return await application_controller.assign_application(application_id, assigned_to,request.old_assignee_id,response)

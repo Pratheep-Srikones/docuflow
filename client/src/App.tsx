@@ -1,4 +1,6 @@
-import { Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/authContext";
+import ProtectedRoute from "./components/ProtectedRoutes";
 import HomePage from "./pages/home/Home";
 import UserLogIn from "./pages/auth/UserLogIn";
 import UserRegister from "./pages/auth/UserRegister";
@@ -11,20 +13,33 @@ import ViewApplication from "./pages/applications/ViewApplication";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="user/auth/login" element={<UserLogIn />} />
-      <Route path="user/auth/register" element={<UserRegister />} />
-      <Route path="staff/auth/login" element={<StaffLogin />} />
-      <Route path="staff/auth/register/u" element={<StaffRegister />} />
-      <Route path="user/" element={<UserDashboard />} />
-      <Route path="staff/" element={<StaffDashboard />} />
-      <Route path="user/application/add" element={<AddApplication />} />
-      <Route
-        path="staff/application/:application_id"
-        element={<ViewApplication />}
-      />
-    </Routes>
+    <AuthProvider>
+      {/* ✅ BrowserRouter should wrap everything */}
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/user/auth/login" element={<UserLogIn />} />
+          <Route path="/user/auth/register" element={<UserRegister />} />
+          <Route path="/staff/auth/login" element={<StaffLogin />} />
+          <Route path="/staff/auth/register" element={<StaffRegister />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute role="user" />}>
+            <Route path="/user" element={<UserDashboard />} />
+            <Route path="/user/application/add" element={<AddApplication />} />
+          </Route>
+
+          <Route element={<ProtectedRoute role="staff" />}>
+            <Route path="/staff" element={<StaffDashboard />} />
+            <Route
+              path="/staff/application/:application_id"
+              element={<ViewApplication />}
+            />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 

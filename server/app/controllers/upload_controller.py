@@ -29,7 +29,7 @@ async def upload_pdf(applicant_id: str, response:Response, file: UploadFile = Fi
     file_name = file_name.lstrip("/")
 
 
-    upload_data = await upload_pdf_to_supabase_storage(file_name,file)
+    upload_data = await upload_pdf_to_supabase_storage(file_name,False,file)
     if upload_data.get("error"):
         response.status_code = upload_data.get("status")
         return upload_data

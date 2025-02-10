@@ -33,7 +33,8 @@ async def sign_pdf(pdf_url: str, text:str,in_status:str, response: Response):
         if delete_data.get("error"):
             response.status_code = delete_data.get("status")
             return delete_data
-        upload_data = await upload.upload_pdf_to_supabase_storage(file_name,pdf_data.get("pdf"))
+        print("Deleted old file \n\n\n\n")
+        upload_data = await upload.upload_pdf_to_supabase_storage(file_name,True ,pdf_data.get("pdf"))
         if upload_data.get("error"):
             response.status_code = upload_data.get("status")
             return upload_data

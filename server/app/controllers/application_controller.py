@@ -87,6 +87,27 @@ async def update_application_reviewed_by(application_id:str,reviewed_by:str,resp
         return application_data
     return application_data
 
+async def update_application(application_id:str,application:application_model.Application,response:Response):
+    if not application_id or application_id.strip() == '':
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error":"Application ID is required"}
+    if len(application_id) != 36:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error":"Invalid application ID format"}
+    if not application:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error":"Application data is required"}
+    application_data = await application_model.update_application_model(application_id,application)
+    if application_data.get("error"):
+        response.status_code = application_data.get("status")
+        return application_data
+    reduced_data = await staff_model.decrease_assigned_applications_model(application.assigned_to)
+    if reduced_data.get("error"):
+        response.status_code = reduced_data.get("status")
+        return reduced_data
+    return application_data
+
+
 async def assign_application(application_id:str,assigned_to:str,old_assignee_id:str ,response:Response):
     if not application_id or application_id.strip() == '':
         response.status_code = status.HTTP_400_BAD_REQUEST

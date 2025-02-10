@@ -68,16 +68,18 @@ const AddApplication = () => {
         status: "pending",
       });
 
-      submit_application(currApplication)
-        .then((response) => {
-          console.log("response of submission: ", response);
-          notifySuccess("Application submitted successfully!");
-          navigate("/user");
-        })
-        .catch((error) => {
-          console.log("error of submission: ", error);
-          notifySuccess("Error submitting application. Please try again.");
-        });
+      if (currApplication.applicant_id) {
+        submit_application(currApplication)
+          .then((response) => {
+            console.log("response of submission: ", response);
+            notifySuccess("Application submitted successfully!");
+            navigate("/user");
+          })
+          .catch((error) => {
+            console.log("error of submission: ", error);
+            notifySuccess("Error submitting application. Please try again.");
+          });
+      }
     }
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +167,7 @@ const AddApplication = () => {
                     Select Branch
                   </option>
                   {branches.map((branch) => (
-                    <option key={branch.brach_id} value={branch.brach_id}>
+                    <option key={branch.branch_id} value={branch.branch_id}>
                       {branch.name}
                     </option>
                   ))}

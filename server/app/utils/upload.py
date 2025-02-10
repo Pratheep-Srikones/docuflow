@@ -8,11 +8,14 @@ import string
 BUCKET_NAME = "documents"
 
 
-async def upload_pdf_to_supabase_storage(file_name:str, file: UploadFile = File(...)):
+async def upload_pdf_to_supabase_storage(file_name:str, signed:bool, file: UploadFile = File(...)):
 
     supabase = await create_supabase_client()
-    file_bytes = file.read()
-
+    if signed:
+        file_bytes =  file.read()
+    else:
+        file_bytes = await file.read()
+    
     try:
         # Upload file to Supabase Storage
         response = await supabase.storage.from_(BUCKET_NAME).upload(

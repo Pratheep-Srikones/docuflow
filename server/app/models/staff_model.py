@@ -159,3 +159,13 @@ async def validate_security_key_model(staff_id: str, security_key: str):
     
     except Exception as e:
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
+    
+async def change_staff_password_model(staff_id: str, hashed_password: str):
+    try:
+        supabase = await get_supabase_client()
+        await supabase.from_('staff').update({"password": hashed_password}).eq('staff_id', staff_id).execute()
+        
+        return {"message": "Password updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}

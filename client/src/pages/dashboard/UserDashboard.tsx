@@ -29,6 +29,7 @@ const UserDashboard = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [action, setAction] = useState("");
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,13 +59,19 @@ const UserDashboard = () => {
     navigate("/user/application/add"); // Route to add application page
   };
 
-  const handleLogOut = () => {
+  const logout = () => {
     localStorage.clear();
     navigate("/"); // Route to log out
   };
 
+  const handle_logout = () => {
+    setModalOpen(true);
+    setAction("logout");
+  };
+
   const handleChangePassword = () => {
     setModalOpen(true);
+    setAction("change_password");
   };
 
   return (
@@ -101,6 +108,9 @@ const UserDashboard = () => {
                     <th className="px-4 py-2 text-left text-gray-700">
                       Status
                     </th>
+                    <th className="px-4 py-2 text-left text-gray-700">
+                      Document
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -108,6 +118,15 @@ const UserDashboard = () => {
                     <tr key={application.application_id} className="border-b">
                       <td className="px-4 py-2">{application.title}</td>
                       <td className="px-4 py-2">{application.status}</td>
+                      <td>
+                        <a
+                          href={application.doc_link}
+                          target="blank"
+                          className="text-blue-600 hover:underline cursor-pointer"
+                        >
+                          View Document
+                        </a>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -153,7 +172,7 @@ const UserDashboard = () => {
             Change Password
           </button>
           <button
-            onClick={handleLogOut}
+            onClick={handle_logout}
             className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition"
           >
             Log Out
@@ -162,64 +181,92 @@ const UserDashboard = () => {
       </main>
       {modalOpen && (
         <div>
-          <div className="w-full h-full bg-black/80 fixed top-0 left-0 flex items-center justify-center z-10 overflow-hidden">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-              <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-                Change Password
-              </h1>
-              <form onSubmit={handlePasswordChange}>
-                <div className="mb-4">
-                  <input
-                    type="password"
-                    placeholder="Old Password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="mb-4">
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="mb-6">
-                  <input
-                    type="password"
-                    placeholder="Confirm New Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="flex justify-center">
+          {action === "change_password" && (
+            <div className="w-full h-full bg-black/80 fixed top-0 left-0 flex items-center justify-center z-10 overflow-hidden">
+              <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                  Change Password
+                </h1>
+                <form onSubmit={handlePasswordChange}>
+                  <div className="mb-4">
+                    <input
+                      type="password"
+                      placeholder="Old Password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <input
+                      type="password"
+                      placeholder="Confirm New Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    >
+                      Change Password
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition ml-4"
+                      onClick={() => {
+                        setModalOpen(false);
+                        setOldPassword("");
+                        setNewPassword("");
+                        setConfirmPassword("");
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          {action === "logout" && (
+            <div className="w-full h-full bg-black/80 fixed top-0 left-0 flex items-center justify-center z-10 overflow-hidden">
+              <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+                <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                  Log Out
+                </h1>
+                <p className="text-center text-gray-600">
+                  Are you sure you want to log out?
+                </p>
+                <div className="flex justify-center mt-6">
                   <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    onClick={logout}
+                    className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                   >
-                    Change Password
+                    Log Out
                   </button>
                   <button
-                    className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition ml-4"
-                    onClick={() => {
-                      setModalOpen(false);
-                      setOldPassword("");
-                      setNewPassword("");
-                      setConfirmPassword("");
-                    }}
+                    className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ml-4"
+                    onClick={() => setModalOpen(false)}
                   >
                     Cancel
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
       <ToastContainer />

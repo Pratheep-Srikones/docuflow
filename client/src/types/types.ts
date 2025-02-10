@@ -76,11 +76,11 @@ export const Application = (): Application => ({
 
 export interface Branch {
   name: string;
-  brach_id: string;
+  branch_id: string;
 }
 export const Branch = (): Branch => ({
   name: "",
-  brach_id: "",
+  branch_id: "",
 });
 
 export interface StaffDetail {

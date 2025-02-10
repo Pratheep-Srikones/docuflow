@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes import staff_auth, user_auth,branches
 from app.routes import pdf
-
+from app.middlewares import middleware
 app = FastAPI()
 
 app.add_middleware(
@@ -13,6 +13,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, etc.)
     allow_headers=["*"],  # Allow all headers
 )
+app.add_middleware(middleware.RoleBasedMiddleware)
 
 @app.get("/")
 def read_root():

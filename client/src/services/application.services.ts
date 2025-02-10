@@ -65,3 +65,19 @@ export const assign_application = async (
     throw error;
   }
 };
+
+export const update_application = async (
+  application_id: string,
+  application: Application
+) => {
+  try {
+    const response = await axiosInstance.put(
+      "applications/" + application_id,
+      application
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating application:", error);
+    throw error;
+  }
+};

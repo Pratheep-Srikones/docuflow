@@ -27,7 +27,6 @@ async def user_login(nic: str, password: str, response: Response):
         user.pop("password", None)
 
         token = create_jwt({"nic": user.get("nic"), "account": "user"})
-        print("user Token IS HERE: =>=>=>=>=>",token)
         return {"user": user, "token": token, "message": "User found & login success", "status": 200}
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

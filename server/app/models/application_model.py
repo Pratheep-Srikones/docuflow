@@ -68,6 +68,28 @@ async def update_application_reviewed_by_model(application_id: str, reviewed_by:
     except Exception as e:
         return {"error": str(e), "message": "Internal Server Error", "status": 500}
 
+async def update_application_model(application_id: str, application: Application):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_('applications').update({
+            "applicant_id": application.applicant_id,
+            "submitted_date": application.submitted_date,
+            "status": application.status,
+            "reviewed_by": application.reviewed_by,
+            "assigned_to": application.assigned_to,
+            "title": application.title,
+            "description": application.description,
+            "signed_by": application.signed_by,
+            "signed_date": application.signed_date,
+            "remarks": application.remarks,
+            "doc_link": application.doc_link,
+            "branch_id": application.branch_id
+        }).eq('application_id', application_id).execute()
+        
+        return {"application": response.data[0], "message": "Application updated", "status": 200}
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Internal Server Error", "status": 500}
 async def assign_application_model(application_id: str, assigned_to: str):
     try:
         supabase = await get_supabase_client()

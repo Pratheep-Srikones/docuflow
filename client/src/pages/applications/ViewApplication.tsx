@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Application, Staff, StaffDetail, User } from "../../types/types";
 import {
   assign_application,
   get_application,
+  update_application,
 } from "../../services/application.services";
 import { get_user_details_by_id } from "../../services/user.servies";
 import { notifyError, notifySuccess } from "../../utils/notify";
@@ -14,7 +14,7 @@ import {
   get_staff_details_by_id,
   validate_security_key,
 } from "../../services/staff.services";
-import { formatTimestamp } from "../../utils/format";
+import { formatSignature, formatTimestamp } from "../../utils/format";
 import { sign_pdf } from "../../services/upload.services";
 import { decrypt } from "../../utils/encrypt";
 
@@ -27,9 +27,13 @@ const ViewApplication = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [action, setAction] = useState("");
   const [securityKey, setSecurityKey] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const [staffs, setStaffs] = useState<StaffDetail[]>([]);
+
+  const staff_id = decrypt(localStorage.getItem("staff_id")!);
+  const curr_date = new Date().toISOString();
+
   const handleValidation = async () => {
     try {
       const data = await validate_security_key(securityKey);
@@ -120,16 +124,101 @@ const ViewApplication = () => {
   };
 
   const handleApproval = async () => {
-    sign_pdf(application.doc_link, "Approved", "Approved").then((res) => {
-      notifySuccess("Application Approved Successfully");
-      setApplication({
-        ...application,
-        status: "Approved",
-        doc_link: res.file_url,
-        signed_by: decrypt(localStorage.getItem("staff_id")!),
-        signed_date: new Date().toISOString(),
+    sign_pdf(
+      application.doc_link,
+      formatSignature(
+        decrypt(localStorage.getItem("staff_name")!),
+        new Date().toISOString() as unknown as string,
+        decrypt(localStorage.getItem("staff_job_title")!),
+        decrypt(localStorage.getItem("staff_role")!),
+        application.remarks,
+        "Approved"
+      ),
+      "Approved"
+    )
+      .then((res) => {
+        notifySuccess("Application Signed Successfully");
+
+        setApplication((prevApp) => ({
+          ...prevApp,
+          status: "approved",
+          doc_link: res.file_url,
+          signed_by: staff_id,
+          signed_date: curr_date,
+          reviewed_by: prevApp.reviewed_by || staff_id, // Only set if empty
+        }));
+
+        update_application(application.application_id, {
+          ...application,
+          status: "approved",
+          doc_link: res.file_url,
+          signed_by: staff_id,
+          signed_date: curr_date,
+          reviewed_by: application.reviewed_by || staff_id,
+        })
+          .then((res) => {
+            notifySuccess("Application Updated Successfully");
+            console.log(res);
+            navigate("/staff");
+          })
+          .catch((error) => {
+            console.error(error);
+            notifyError("Error updating application");
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+        notifyError("Error signing PDF");
       });
-    });
+  };
+
+  const handleRejection = async () => {
+    sign_pdf(
+      application.doc_link,
+      formatSignature(
+        decrypt(localStorage.getItem("staff_name")!),
+        new Date().toISOString() as unknown as string,
+        decrypt(localStorage.getItem("staff_job_title")!),
+        decrypt(localStorage.getItem("staff_role")!),
+        application.remarks,
+        "Rejected"
+      ),
+      "Rejected"
+    )
+      .then((res) => {
+        notifySuccess("Application Signed Successfully");
+
+        setApplication((prevApp) => ({
+          ...prevApp,
+          status: "rejected",
+          doc_link: res.file_url,
+          signed_by: staff_id,
+          signed_date: curr_date,
+          reviewed_by: prevApp.reviewed_by || staff_id, // Only set if empty
+        }));
+
+        update_application(application.application_id, {
+          ...application,
+          status: "rejected",
+          doc_link: res.file_url,
+          signed_by: staff_id,
+          signed_date: curr_date,
+          reviewed_by: application.reviewed_by || staff_id,
+        })
+          .then((res) => {
+            notifySuccess("Application Updated Successfully");
+            console.log(res);
+            navigate("/staff");
+          })
+          .catch((error) => {
+            console.error(error);
+            notifyError("Error updating application");
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+        notifyError("Error signing PDF");
+      });
   };
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
@@ -326,7 +415,10 @@ const ViewApplication = () => {
                     ?
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-4 mt-4">
-                    <button className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition w-full sm:w-auto">
+                    <button
+                      onClick={handleRejection}
+                      className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition w-full sm:w-auto"
+                    >
                       Reject
                     </button>
                     <button

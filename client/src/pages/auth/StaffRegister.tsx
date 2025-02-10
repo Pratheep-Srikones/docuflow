@@ -373,8 +373,11 @@ const StaffRegister: React.FC = () => {
               setCurrStaff({ ...currStaff, branch_id: e.target.value })
             }
           >
+            <option value="" disabled>
+              Select Branch
+            </option>
             {branches.map((branch) => (
-              <option key={branch.brach_id} value={branch.brach_id}>
+              <option key={branch.branch_id} value={branch.branch_id}>
                 {branch.name}
               </option>
             ))}
