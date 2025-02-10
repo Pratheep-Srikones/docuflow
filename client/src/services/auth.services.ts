@@ -30,7 +30,7 @@ export const user_login = async (nic: string, password: string) => {
 export const user_register = async (user: User) => {
   try {
     const response = await axiosInstance.post("/auth/user/register", user);
-    console.log(response);
+
     return response.data;
   } catch (error) {
     console.error("Error while registering user:", error);
@@ -70,7 +70,7 @@ export const staff_login = async (email: string, password: string) => {
 export const staff_register = async (staff: Staff) => {
   try {
     const response = await axiosInstance.post("/auth/staff/register", staff);
-    console.log(response);
+
     return response.data;
   } catch (error) {
     console.error("Error while registering staff:", error);

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Branch, Staff } from "../../types/types";
 import { staff_register } from "../../services/auth.services";
@@ -43,8 +42,7 @@ const StaffRegister: React.FC = () => {
     }
     try {
       staff_register(currStaff)
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           notifySuccess("Staff registered successfully");
         })
         .catch((error) => {
@@ -86,7 +84,6 @@ const StaffRegister: React.FC = () => {
       try {
         const response = await getBranches();
         setBranches(response.branches);
-        console.log("branches: ", branches);
       } catch (error) {
         console.error("Error while fetching branches:", error);
       }

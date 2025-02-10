@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { uploadFile } from "../../services/upload.services";
 import { Application, Branch } from "../../types/types";
@@ -22,7 +21,6 @@ const AddApplication = () => {
       try {
         const response = await getBranches();
         setBranches(response.branches);
-        console.log("branches: ", branches);
       } catch (error) {
         console.error("Error while fetching branches:", error);
       }
@@ -39,7 +37,6 @@ const AddApplication = () => {
     } else {
       uploadFile(file)
         .then((response) => {
-          console.log("response of upload: ", response);
           notifySuccess("File uploaded successfully!");
           setFileUploaded(true);
           setCurrApplication({
@@ -70,8 +67,7 @@ const AddApplication = () => {
 
       if (currApplication.applicant_id) {
         submit_application(currApplication)
-          .then((response) => {
-            console.log("response of submission: ", response);
+          .then(() => {
             notifySuccess("Application submitted successfully!");
             navigate("/user");
           })
@@ -159,7 +155,6 @@ const AddApplication = () => {
                       ...currApplication,
                       branch_id: e.target.value,
                     });
-                    console.log(currApplication);
                   }}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >

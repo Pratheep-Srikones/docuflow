@@ -38,8 +38,7 @@ const UserRegister = () => {
       return;
     }
     user_register(currUser)
-      .then((data) => {
-        console.log(data);
+      .then(() => {
         notifySuccess("User registered successfully!");
         navigate("/user/auth/login");
       })

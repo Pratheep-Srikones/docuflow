@@ -4,7 +4,6 @@ import { decrypt } from "../utils/encrypt";
 
 export const submit_application = async (application: Application) => {
   try {
-    console.log("application: ", application);
     const response = await axiosInstance.post("applications", application);
     return response.data;
   } catch (error) {

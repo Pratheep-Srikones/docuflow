@@ -28,8 +28,7 @@ const StaffLogin = () => {
     e.preventDefault();
     try {
       staff_login(email, password)
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           notifySuccess("Logged in successfully");
           navigate("/staff");
         })

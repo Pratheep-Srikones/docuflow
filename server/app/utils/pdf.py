@@ -10,7 +10,6 @@ colors = {
 
 async def sign_pdf(pdf_url:str,text:str,status:str):
     try:
-        print(pdf_url)
         async with httpx.AsyncClient() as client:
             response = await client.get(pdf_url)
         if response.status_code != 200 or not response.content:

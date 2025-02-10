@@ -24,8 +24,7 @@ const UserLogin = () => {
     e.preventDefault();
     try {
       user_login(nic, password)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
           notifySuccess("Login Successful");
           navigate("/user/");
         })

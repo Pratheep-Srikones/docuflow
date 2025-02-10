@@ -33,7 +33,6 @@ async def upload_pdf_to_supabase_storage(file_name:str, signed:bool, file: Uploa
         
         # Get the public URL of the uploaded file
         files = await supabase.storage.from_("documents").list()
-        print(files)
 
         file_url = await supabase.storage.from_("documents").create_signed_url(file_name, 3600*24*365)
 

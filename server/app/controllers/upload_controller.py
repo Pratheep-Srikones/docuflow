@@ -16,7 +16,6 @@ async def upload_pdf(applicant_id: str, response:Response, file: UploadFile = Fi
         return {"error": "Only PDF files allowed", "status": 400}
     applicant = await get_user_by_id(applicant_id,response)
     applicant = applicant.get("user")
-    print("APPLICANT->",applicant)
 
     if applicant is None:
         return {"error": "Applicant not found", "status": 404}

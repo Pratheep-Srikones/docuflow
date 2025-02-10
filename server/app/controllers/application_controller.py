@@ -147,7 +147,6 @@ async def create_application(application:application_model.Application,response:
                 return {"message":"Previous application is pending","error":"Cannot submit multiple applications","status":409}
             
     staff_data = await staff_model.get_staff_with_low_applications_model(application.branch_id)
-    print("staff",staff_data)
     if staff_data.get("error"):
         response.status_code = staff_data.get("status")
         return staff_data

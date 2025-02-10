@@ -35,5 +35,4 @@ async def staff_register(staff: staff_model.Staff, response: Response):
 
 @router.post("/password/change/{staff_id}", status_code=200)
 async def change_password(staff_id: str, request: changePasswordRequest ,response: Response):
-    print("change password")
     return await staff_controller.change_staff_password(staff_id, request.old_password, request.new_password, response)

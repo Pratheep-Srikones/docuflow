@@ -156,9 +156,8 @@ const ViewApplication = () => {
           signed_date: curr_date,
           reviewed_by: application.reviewed_by || staff_id,
         })
-          .then((res) => {
+          .then(() => {
             notifySuccess("Application Updated Successfully");
-            console.log(res);
             navigate("/staff");
           })
           .catch((error) => {
@@ -205,9 +204,8 @@ const ViewApplication = () => {
           signed_date: curr_date,
           reviewed_by: application.reviewed_by || staff_id,
         })
-          .then((res) => {
+          .then(() => {
             notifySuccess("Application Updated Successfully");
-            console.log(res);
             navigate("/staff");
           })
           .catch((error) => {

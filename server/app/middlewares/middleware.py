@@ -17,9 +17,7 @@ class RoleBasedMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
        
 
-        print(request.headers)
         auth_header = request.headers.get("Authorization")
-        print(auth_header)
 
         if not auth_header or not auth_header.startswith("Bearer "):
             return Response(content="Unauthorized: Missing token", status_code=401)
@@ -27,7 +25,6 @@ class RoleBasedMiddleware(BaseHTTPMiddleware):
         token = auth_header.split(" ")[1]
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            print(payload)
             request.state.user = payload  # Store user info in request.state
 
             # ** Role-Based Access Control (RBAC) **
