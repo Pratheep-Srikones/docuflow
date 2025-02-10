@@ -28,7 +28,7 @@ DocuFlow is a digital document submission and approval system designed for Organ
 ### Backend Setup (FastAPI)
 ```sh
 # Navigate to the backend directory
-cd backend
+cd server
 
 # Install dependencies
 pip install -r requirements.txt
@@ -40,7 +40,7 @@ uvicorn main:app --reload
 ### Frontend Setup (React.js)
 ```sh
 # Navigate to the frontend directory
-cd frontend
+cd client
 
 # Install dependencies
 npm install
