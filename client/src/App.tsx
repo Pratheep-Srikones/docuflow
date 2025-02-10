@@ -10,8 +10,16 @@ import UserDashboard from "./pages/dashboard/UserDashboard";
 import StaffDashboard from "./pages/dashboard/StaffDashboard";
 import AddApplication from "./pages/applications/AddApplication";
 import ViewApplication from "./pages/applications/ViewApplication";
+import { useEffect } from "react";
+import { get_org_details } from "./services/organization.services";
 
 const App = () => {
+  useEffect(() => {
+    const fetch_org = async () => {
+      get_org_details();
+    };
+    fetch_org();
+  }, []);
   return (
     <AuthProvider>
       {/* ✅ BrowserRouter should wrap everything */}

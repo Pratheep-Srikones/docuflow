@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { staff_login } from "../../services/auth.services";
 import { notifyError, notifySuccess } from "../../utils/notify";
 import { ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const StaffLogin = () => {
+  useEffect(() => {
+    if (
+      localStorage.getItem("token") !== null &&
+      localStorage.getItem("staff_id") !== ""
+    ) {
+      navigate("/user/");
+    }
+  });
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

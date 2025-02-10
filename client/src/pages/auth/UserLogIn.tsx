@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { user_login } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/notify";
@@ -10,6 +10,15 @@ const UserLogin = () => {
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [validNIC, setValidNIC] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("token") !== null &&
+      localStorage.getItem("user_id") !== ""
+    ) {
+      navigate("/user/");
+    }
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

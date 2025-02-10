@@ -1,6 +1,14 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { get_org_details } from "../../services/organization.services";
 
 const HomePage = () => {
+  useEffect(() => {
+    const fetch_org = async () => {
+      get_org_details();
+    };
+    fetch_org();
+  }, []);
   return (
     <div className="bg-white text-gray-900 min-h-screen flex flex-col">
       <header className="py-6 px-8 bg-blue-600 text-white">
@@ -13,10 +21,10 @@ const HomePage = () => {
         </p>
         <div className="mt-6 text-center">
           <p className="text-lg font-medium md:text-xl text-yellow-200">
-            Organization Name
+            {localStorage.getItem("org_name")}
           </p>
           <p className="text-sm md:text-base text-gray-300">
-            1234 Main St, Anytown, USA
+            {localStorage.getItem("org_address")}
           </p>
         </div>
       </header>

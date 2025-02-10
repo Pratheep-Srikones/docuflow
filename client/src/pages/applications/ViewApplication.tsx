@@ -283,7 +283,7 @@ const ViewApplication = () => {
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Remarks</h2>
             <textarea
-              value={application.remarks}
+              value={application.remarks || "null"}
               onChange={(e) =>
                 setApplication({ ...application, remarks: e.target.value })
               }

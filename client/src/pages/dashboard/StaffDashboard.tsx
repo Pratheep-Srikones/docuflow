@@ -72,9 +72,11 @@ const StaffDashboard = () => {
       {/* Header */}
       <header className="bg-blue-600 text-white py-4 px-8">
         <h1 className="text-2xl font-semibold text-center">
-          Organization Name
+          {localStorage.getItem("org_name")}
         </h1>
-        <p className="text-sm text-center">1234 Main St, Anytown, USA</p>
+        <p className="text-sm text-center">
+          {localStorage.getItem("org_address")}
+        </p>
       </header>
 
       <main className="px-8 py-12">

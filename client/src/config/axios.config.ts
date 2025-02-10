@@ -13,6 +13,9 @@ axiosInstance.interceptors.request.use(
     if (config.url?.includes("/auth")) {
       return config;
     }
+    if (config.url?.includes("/organization")) {
+      return config;
+    }
     const token = decrypt(localStorage.getItem("token")!);
     config.headers.Authorization = token ? `Bearer ${token}` : "";
     return config;

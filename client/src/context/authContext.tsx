@@ -1,9 +1,8 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
   user: { staff_id?: string; user_id?: string } | null;
-  login: (token: string) => void;
+  login: (token: string, roleId: string, role: "staff" | "user") => void;
   logout: () => void;
 }
 
@@ -15,37 +14,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     user_id?: string;
   } | null>(null);
 
+  // ✅ Load user from localStorage when app starts
   useEffect(() => {
     const token = localStorage.getItem("token");
     const staff_id = localStorage.getItem("staff_id");
     const user_id = localStorage.getItem("user_id");
+
     if (token) {
-      try {
-        if (staff_id) {
-          // console.log("adding staff_id: ", staff_id);
-          setUser({ staff_id: staff_id });
-        } else if (user_id) {
-          //console.log("adding user_id: ", user_id);
-          setUser({ user_id: user_id });
-        }
-      } catch (error) {
-        console.error("Invalid token", error);
-        logout();
+      if (staff_id) {
+        setUser({ staff_id });
+      } else if (user_id) {
+        setUser({ user_id });
       }
     }
   }, []);
 
-  const login = () => {
-    const staff_id = localStorage.getItem("staff_id");
-    const user_id = localStorage.getItem("user_id");
-    if (staff_id) {
-      setUser({ staff_id: staff_id });
-    } else if (user_id) {
-      setUser({ user_id: user_id });
+  // ✅ Save token & user role on login
+  const login = (token: string, roleId: string, role: "staff" | "user") => {
+    localStorage.setItem("token", token);
+    if (role === "staff") {
+      localStorage.setItem("staff_id", roleId);
+      setUser({ staff_id: roleId });
+    } else if (role === "user") {
+      localStorage.setItem("user_id", roleId);
+      setUser({ user_id: roleId });
     }
   };
 
+  // ✅ Remove token & user role on logout
   const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("staff_id");
+    localStorage.removeItem("user_id");
     setUser(null);
   };
 
@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// ✅ Custom Hook for using Auth
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

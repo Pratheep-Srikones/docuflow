@@ -13,6 +13,9 @@ class RoleBasedMiddleware(BaseHTTPMiddleware):
         #
         if request.url.path.startswith("/auth"):
             return await call_next(request)
+        if request.url.path.startswith("/organization"):
+            return await call_next(request)
+       
 
         print(request.headers)
         auth_header = request.headers.get("Authorization")
@@ -33,7 +36,7 @@ class RoleBasedMiddleware(BaseHTTPMiddleware):
                     return Response(content="Forbidden: Staff access required", status_code=403)
 
             elif request.url.path.startswith("/user"):
-                if "account" not in payload or payload["account"] != "user":
+                if "account" not in payload or (payload["account"] != "user" and payload["account"] != "staff"):
                     return Response(content="Forbidden: User access required", status_code=403)
 
         except jwt.ExpiredSignatureError:
